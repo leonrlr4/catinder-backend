@@ -8,7 +8,7 @@ import (
 
 func HomePage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "you are in! mother fucker",
+		"message": "you are in! mother fucker! ",
 	})
 }
 

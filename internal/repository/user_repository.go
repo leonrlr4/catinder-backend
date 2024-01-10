@@ -2,6 +2,7 @@ package repository
 
 import (
 	"catinder/internal/model"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -9,6 +10,7 @@ import (
 var db *gorm.DB
 
 func CreateUser(user *model.User) error {
+	fmt.Println(user)
 	result := db.Create(user)
 	return result.Error
 }

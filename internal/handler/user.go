@@ -3,6 +3,7 @@ package handler
 import (
 	"catinder/internal/model"
 	"catinder/internal/repository"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ type RegisterInfo struct {
 // handle htte request
 func RegisterUser(c *gin.Context) {
 	var regInfo RegisterInfo
+	fmt.Println(c)
 	if err := c.ShouldBindJSON(&regInfo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid registration information"})
 		return

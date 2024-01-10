@@ -1,0 +1,7 @@
+[build]
+cmd = "go build -o ./tmp/main ./cmd/server"
+bin = "tmp/main"
+
+[watch]
+includes = ["."]
+excludes = ["tmp", "bin"]
