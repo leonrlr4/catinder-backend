@@ -26,3 +26,6 @@ server
 
 # air binaries
 /tmp/
+
+# mac os
+.DS_Store
