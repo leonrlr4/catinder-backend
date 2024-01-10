@@ -1,0 +1,22 @@
+# Binary files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test files
+*.test
+*.out
+
+# Vendor directory
+/vendor/
+
+# Log files
+*.log
+
+# VS Code settings
+.vscode/
+
+# Compiled server binary
+/server
