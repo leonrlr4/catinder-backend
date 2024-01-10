@@ -19,7 +19,7 @@
 .vscode/
 
 # Compiled server binary
-/server
+./server
 
 # Environment variables
 .env
