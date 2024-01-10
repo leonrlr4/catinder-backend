@@ -5,8 +5,10 @@ import (
 	"catinder/internal/model"
 	"catinder/internal/repository"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -14,8 +16,19 @@ import (
 func main() {
 	r := gin.Default()
 
+	// read .env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	// get dsn from environment variable
+	dsn := os.Getenv("DATABASE_DSN")
+	if dsn == "" {
+		log.Fatal("DATABASE_DSN environment variable is not set")
+	}
+
 	// db connect
-	dsn := "root:password@tcp(127.0.0.1:3306)/catinder?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
