@@ -45,3 +45,24 @@ func RegisterUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Registration successful"})
 }
+
+func GetUser(c *gin.Context) {
+	// get user ID from URL params
+	userID := c.Param("userId")
+	fmt.Println(userID)
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No user ID provided"})
+		return
+	}
+
+	// find user by ID
+	user, err := repository.FindUserByID(userID)
+	if err != nil {
+		// error handling
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not find user"})
+		return
+	}
+
+	// return found user
+	c.JSON(http.StatusOK, gin.H{"user": user})
+}

@@ -8,11 +8,16 @@ import (
 
 func HomePage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "you are in! mother fucker! ",
+		"message": "you are in! mother fuxxer! ",
 	})
 }
 
 func SetupRoutes(r *gin.Engine) {
-	r.POST("/register", RegisterUser)
+	// home page route
 	r.GET("/", HomePage)
+
+	// user routes
+	r.POST("/user/register", RegisterUser)
+	r.GET("/user/:userId", GetUser)
+
 }

@@ -15,6 +15,15 @@ func CreateUser(user *model.User) error {
 	return result.Error
 }
 
+func FindUserByID(userID string) (*model.User, error) {
+	var user model.User
+	result := db.First(&user, userID)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
 func InitializeDatabase(d *gorm.DB) {
 	db = d
 }
