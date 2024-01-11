@@ -13,6 +13,7 @@ import (
 // parse request body
 type RegisterInfo struct {
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -34,6 +35,7 @@ func RegisterUser(c *gin.Context) {
 
 	newUser := model.User{
 		Username: regInfo.Username,
+		Email:    regInfo.Email,
 		Password: string(hashedPassword),
 	}
 
@@ -49,7 +51,6 @@ func RegisterUser(c *gin.Context) {
 func GetUser(c *gin.Context) {
 	// get user ID from URL params
 	userID := c.Param("userId")
-	fmt.Println(userID)
 	if userID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No user ID provided"})
 		return
@@ -63,6 +64,13 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
+	mapedUser := map[string]interface{}{
+		"username":  user.Username,
+		"email":     user.Email,
+		"createdAt": user.CreatedAt,
+	}
+
+	// fmt.Println(mapedUser)
 	// return found user
-	c.JSON(http.StatusOK, gin.H{"user": user})
+	c.JSON(http.StatusOK, gin.H{"user": mapedUser})
 }

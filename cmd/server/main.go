@@ -18,6 +18,7 @@ func main() {
 
 	// read .env
 	err := godotenv.Load()
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -27,7 +28,6 @@ func main() {
 	if dsn == "" {
 		log.Fatal("DATABASE_DSN environment variable is not set")
 	}
-
 	// db connect
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {

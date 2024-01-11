@@ -17,7 +17,11 @@ func CreateUser(user *model.User) error {
 
 func FindUserByID(userID string) (*model.User, error) {
 	var user model.User
-	result := db.First(&user, userID)
+	result := db.
+		Select("ID, Username, Email").
+		Omit("Password", "DeletedAt").
+		First(&user, userID)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
