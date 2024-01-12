@@ -1,13 +1,13 @@
-package handler
+package service
 
 import (
-	"catinder/internal/model"
+	"catinder/internal/entity"
 	"catinder/internal/repository"
+	"catinder/util"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // parse request body
@@ -27,13 +27,13 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	// hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(regInfo.Password), bcrypt.DefaultCost)
+	hashedPassword, err := util.HashPassword(regInfo.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
 	}
 
-	newUser := model.User{
+	newUser := entity.User{
 		Username: regInfo.Username,
 		Email:    regInfo.Email,
 		Password: string(hashedPassword),
@@ -41,7 +41,7 @@ func RegisterUser(c *gin.Context) {
 
 	// call user repository to create user
 	if err := repository.CreateUser(&newUser); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		util.ErrorResponse(c, http.StatusBadRequest, "error: Failed to create user")
 		return
 	}
 

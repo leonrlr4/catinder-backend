@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"catinder/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,11 +14,11 @@ func HomePage(c *gin.Context) {
 }
 
 func SetupRoutes(r *gin.Engine) {
-	// home page route
-	r.GET("/", HomePage)
-
-	// user routes
-	r.POST("/user/register", RegisterUser)
-	r.GET("/user/:userId", GetUser)
-
+	// v1 API routes
+	v1 := r.Group("/v1")
+	{
+		v1.GET("/", HomePage)
+		v1.POST("/user/register", service.RegisterUser)
+		v1.GET("/user/:userId", service.GetUser)
+	}
 }

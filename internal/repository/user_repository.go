@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"catinder/internal/model"
+	"catinder/internal/entity"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -9,14 +9,14 @@ import (
 
 var db *gorm.DB
 
-func CreateUser(user *model.User) error {
+func CreateUser(user *entity.User) error {
 	fmt.Println(user)
 	result := db.Create(user)
 	return result.Error
 }
 
-func FindUserByID(userID string) (*model.User, error) {
-	var user model.User
+func FindUserByID(userID string) (*entity.User, error) {
+	var user entity.User
 	result := db.
 		Select("ID, Username, Email").
 		Omit("Password", "DeletedAt").
