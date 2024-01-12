@@ -1,8 +1,8 @@
 package main
 
 import (
-	"catinder/internal/handler"
-	"catinder/internal/model"
+	"catinder/internal/entity"
+	"catinder/internal/handler/v1"
 	"catinder/internal/repository"
 	"log"
 	"os"
@@ -34,7 +34,7 @@ func main() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	// migrate user table
-	if err := db.AutoMigrate(&model.User{}); err != nil {
+	if err := db.AutoMigrate(&entity.User{}); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 

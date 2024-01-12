@@ -2,7 +2,6 @@ package repository
 
 import (
 	"catinder/internal/entity"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -10,7 +9,6 @@ import (
 var db *gorm.DB
 
 func CreateUser(user *entity.User) error {
-	fmt.Println(user)
 	result := db.Create(user)
 	return result.Error
 }

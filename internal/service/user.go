@@ -1,76 +1,42 @@
+// service/user.go
+
 package service
 
 import (
 	"catinder/internal/entity"
 	"catinder/internal/repository"
 	"catinder/util"
-	"fmt"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
-// parse request body
-type RegisterInfo struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-// handle htte request
-func RegisterUser(c *gin.Context) {
-	var regInfo RegisterInfo
-	fmt.Println(c)
-	if err := c.ShouldBindJSON(&regInfo); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid registration information"})
-		return
-	}
-
-	// hash password
-	hashedPassword, err := util.HashPassword(regInfo.Password)
+// RegisterUser 處理註冊的業務邏輯，不涉及 HTTP 層面的操作。
+func RegisterUser(username, email, password string) (*entity.User, error) {
+	// Hash password
+	hashedPassword, err := util.HashPassword(password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
+		return nil, err
 	}
 
 	newUser := entity.User{
-		Username: regInfo.Username,
-		Email:    regInfo.Email,
-		Password: string(hashedPassword),
+		Username: username,
+		Email:    email,
+		Password: hashedPassword,
 	}
 
-	// call user repository to create user
+	// Call user repository to create user
 	if err := repository.CreateUser(&newUser); err != nil {
-		util.ErrorResponse(c, http.StatusBadRequest, "error: Failed to create user")
-		return
+		return nil, err
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Registration successful"})
+	return &newUser, nil
 }
 
-func GetUser(c *gin.Context) {
-	// get user ID from URL params
-	userID := c.Param("userId")
-	if userID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No user ID provided"})
-		return
-	}
-
-	// find user by ID
+// GetUser 處理獲取用戶的業務邏輯，不涉及 HTTP 層面的操作。
+func GetUser(userID string) (*entity.User, error) {
+	// Find user by ID
 	user, err := repository.FindUserByID(userID)
 	if err != nil {
-		// error handling
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not find user"})
-		return
+		return nil, err
 	}
 
-	mapedUser := map[string]interface{}{
-		"username":  user.Username,
-		"email":     user.Email,
-		"createdAt": user.CreatedAt,
-	}
-
-	// fmt.Println(mapedUser)
-	// return found user
-	c.JSON(http.StatusOK, gin.H{"user": mapedUser})
+	return user, nil
 }
