@@ -16,7 +16,7 @@ func CreateUser(user *entity.User) error {
 func FindUserByID(userID string) (*entity.User, error) {
 	var user entity.User
 	result := db.
-		Select("ID, Username, Email").
+		Select("ID, Username, Email, Picture").
 		Omit("Password", "DeletedAt").
 		First(&user, userID)
 

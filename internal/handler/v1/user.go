@@ -21,7 +21,6 @@ func RegisterUserHandler(c *gin.Context) {
 	_, err := service.RegisterUser(regInfo.Username, regInfo.Email, regInfo.Password)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
-		// c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -33,7 +32,6 @@ func GetUserHandler(c *gin.Context) {
 	userID := c.Param("userId")
 	if userID == "" {
 		util.ErrorResponse(c, http.StatusBadRequest, "No user ID provided")
-		// c.JSON(http.StatusBadRequest, gin.H{"error": "No user ID provided"})
 		return
 	}
 
@@ -41,7 +39,6 @@ func GetUserHandler(c *gin.Context) {
 	user, err := service.GetUser(userID)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
-		// c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not find user"})
 		return
 	}
 

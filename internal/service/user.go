@@ -8,7 +8,7 @@ import (
 	"catinder/util"
 )
 
-// RegisterUser 處理註冊的業務邏輯，不涉及 HTTP 層面的操作。
+// RegisterUser 處理註冊的業務邏輯
 func RegisterUser(username, email, password string) (*entity.User, error) {
 	// Hash password
 	hashedPassword, err := util.HashPassword(password)
@@ -20,6 +20,7 @@ func RegisterUser(username, email, password string) (*entity.User, error) {
 		Username: username,
 		Email:    email,
 		Password: hashedPassword,
+		Picture:  "https://miro.medium.com/v2/resize:fit:720/format:webp/1*kznyUoRgUcw9pCQUaGfbNw.jpeg",
 	}
 
 	// Call user repository to create user
@@ -30,7 +31,7 @@ func RegisterUser(username, email, password string) (*entity.User, error) {
 	return &newUser, nil
 }
 
-// GetUser 處理獲取用戶的業務邏輯，不涉及 HTTP 層面的操作。
+// GetUser 處理獲取用戶的業務邏輯
 func GetUser(userID string) (*entity.User, error) {
 	// Find user by ID
 	user, err := repository.FindUserByID(userID)
