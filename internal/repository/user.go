@@ -13,7 +13,7 @@ func CreateUser(user *entity.User) error {
 	return result.Error
 }
 
-func FindUserByID(userID string) (*entity.User, error) {
+func FindUserByID(userID int) (*entity.User, error) {
 	var user entity.User
 	result := db.
 		Select("ID, Username, Email, Picture").

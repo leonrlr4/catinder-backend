@@ -32,7 +32,7 @@ func RegisterUser(username, email, password string) (*entity.User, error) {
 }
 
 // GetUserByID
-func GetUser(userID string) (*entity.User, error) {
+func GetUser(userID int) (*entity.User, error) {
 	// Find user by ID
 	user, err := repository.FindUserByID(userID)
 	if err != nil {

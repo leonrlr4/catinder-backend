@@ -3,7 +3,6 @@ package handler
 import (
 	"catinder/internal/middleware"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,23 +23,16 @@ func SetupRoutes(r *gin.Engine) {
 	// user
 	user := r.Group("/v1/user")
 	{
-		user.GET("/:userId", GetUserHandler)
 		user.POST("/register", RegisterUserHandler)
-	}
 
-	// google oauth
-	auth := r.Group("/v1/auth")
-	{
-		auth.POST("/login", LocalLoginHandler)
-
-		auth.GET("/google/login", GoogleLoginHandler)
-		auth.GET("/google/callback", GoogleCallbackHandler)
-
+		user.GET("/profile", middleware.AuthMiddleware(), GetUserHandler)
 	}
 
 	// auth
-	auth.Group("/v1", middleware.Auth(os.Getenv("JWT_SECRET")))
+	auth := r.Group("v1/auth")
 	{
-
+		auth.POST("/login", LocalLoginHandler)
+		auth.GET("/google/login", GoogleLoginHandler)
+		auth.GET("/google/callback", GoogleCallbackHandler)
 	}
 }

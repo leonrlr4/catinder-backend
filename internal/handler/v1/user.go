@@ -29,9 +29,10 @@ func RegisterUserHandler(c *gin.Context) {
 
 func GetUserHandler(c *gin.Context) {
 	// Get user ID from URL params
-	userID := c.Param("userId")
-	if userID == "" {
-		util.ErrorResponse(c, http.StatusBadRequest, "No user ID provided")
+	userID := c.GetInt("userID")
+
+	if userID == 0 {
+		util.ErrorResponse(c, http.StatusBadRequest, "No user found")
 		return
 	}
 

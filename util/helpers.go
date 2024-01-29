@@ -2,6 +2,7 @@ package util
 
 import (
 	"os"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -33,4 +34,19 @@ func GenerateToken(userID int) (string, error) {
 	})
 
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+}
+
+// parse jwt token
+func ParseToken(tokenString string) (int, error) {
+	tokenString = strings.Split(tokenString, " ")[1]
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	claims, _ := token.Claims.(jwt.MapClaims)
+
+	return int(claims["user_id"].(float64)), nil
 }
