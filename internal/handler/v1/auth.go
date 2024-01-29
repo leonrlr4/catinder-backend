@@ -2,8 +2,10 @@ package handler
 
 import (
 	"catinder/internal/dto"
+	"catinder/internal/service"
 	"catinder/util"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -77,6 +79,27 @@ func LocalLoginHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := service.GetUserByEmail()
+	// check is user  exist
+	fmt.Println(loginInfo)
 
+	user, err := service.GetUserByEmail(loginInfo.Email)
+	// fmt.Println(user)
+	if err != nil {
+		util.ErrorResponse(c, http.StatusBadRequest, "user not exist")
+		return
+	}
+	// check password
+	if !(util.CheckPasswordHash(loginInfo.Password, user.Password)) {
+		util.ErrorResponse(c, http.StatusBadRequest, "wrong password")
+		return
+	}
+
+	// Generate the JWT token for the user
+	token, err := util.GenerateToken(int(user.ID))
+	if err != nil {
+		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
 }

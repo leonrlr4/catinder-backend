@@ -18,13 +18,13 @@ func RegisterUserHandler(c *gin.Context) {
 	}
 
 	// 調用 service 層的 RegisterUser 函數
-	_, err := service.RegisterUser(regInfo.Username, regInfo.Email, regInfo.Password)
+	newUser, err := service.RegisterUser(regInfo.Username, regInfo.Email, regInfo.Password)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Registration successful"})
+	c.JSON(http.StatusOK, gin.H{"newUser": newUser})
 }
 
 func GetUserHandler(c *gin.Context) {

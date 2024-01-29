@@ -16,16 +16,21 @@ func HashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
+// check password hash
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func ErrorResponse(c *gin.Context, status int, message string) {
 	c.JSON(status, gin.H{"error": message})
 }
 
 // generate jwt token
-func GenerateToken(userID string) (string, error) {
+func GenerateToken(userID int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
 	})
 
-	// Sign and get the complete encoded token as a string using the secret
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
