@@ -31,10 +31,21 @@ func RegisterUser(username, email, password string) (*entity.User, error) {
 	return &newUser, nil
 }
 
-// GetUser 處理獲取用戶的業務邏輯
+// GetUserByID
 func GetUser(userID string) (*entity.User, error) {
 	// Find user by ID
 	user, err := repository.FindUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// GetUserByEmail
+func GetUserByEmail(email string) (*entity.User, error) {
+	// Find user by email
+	user, err := repository.FindUserByEmail(email)
 	if err != nil {
 		return nil, err
 	}

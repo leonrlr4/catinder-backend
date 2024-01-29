@@ -26,11 +26,10 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		user.GET("/:userId", GetUserHandler)
 		user.POST("/register", RegisterUserHandler)
-
+		user.POST("/login", LocalLoginHandler)
 	}
 
-	// register
-
+	// google oauth
 	auth := r.Group("/auth")
 	{
 		auth.GET("/google/login", GoogleLoginHandler)
@@ -40,5 +39,6 @@ func SetupRoutes(r *gin.Engine) {
 	// jwt
 	r.Group("/v1", middleware.Auth(os.Getenv("JWT_SECRET")))
 	{
+
 	}
 }

@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"catinder/internal/dto"
+	"catinder/util"
 	"encoding/json"
 	"net/http"
 
@@ -66,4 +68,15 @@ func GoogleCallbackHandler(c *gin.Context) {
 	// ... (JWT token generation logic)
 
 	c.JSON(http.StatusOK, gin.H{"token": "your_jwt_token_here"})
+}
+
+func LocalLoginHandler(c *gin.Context) {
+	var loginInfo dto.LocalLoginInfo
+	if err := c.ShouldBindJSON(&loginInfo); err != nil {
+		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user, err := service.GetUserByEmail()
+
 }

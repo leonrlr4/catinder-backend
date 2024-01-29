@@ -36,7 +36,6 @@ func main() {
 	if err := db.AutoMigrate(&entity.User{}); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
-
 	// init repository
 	repository.InitializeDatabase(db)
 

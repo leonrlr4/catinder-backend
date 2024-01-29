@@ -29,3 +29,16 @@ func FindUserByID(userID string) (*entity.User, error) {
 func InitializeDatabase(d *gorm.DB) {
 	db = d
 }
+
+func FindUserByEmail(email string) (*entity.User, error) {
+	var user entity.User
+	result := db.
+		Select("ID, Username, Email, Password, Picture").
+		Where("email = ?", email).
+		First(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}

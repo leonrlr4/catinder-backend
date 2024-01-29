@@ -7,3 +7,8 @@ type RegisterInfo struct {
 	Password string `json:"password"`
 	Picture  string `json:"picture"`
 }
+
+type LocalLoginInfo struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
