@@ -12,13 +12,13 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO
-    users (name, email, password)
+    users (username, email, password)
 VALUES
     ('John Doe', 'john@gmail.com', '123456');
 
 CREATE TABLE IF NOT EXISTS cats (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
     age INT NOT NULL,
     breed VARCHAR(255) NOT NULL,
     owner_id INT,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS cats (
 );
 
 INSERT INTO
-    cats (name, age, breed, owner_id)
+    cats (username, age, breed, owner_id)
 VALUES
     ('Garfield', 5, 'Persian', 1),
     ('Tom', 3, 'Siamese', 1),
