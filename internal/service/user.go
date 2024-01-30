@@ -8,26 +8,40 @@ import (
 	"catinder/util"
 )
 
+type newUser struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Picture  string `json:"picture"`
+}
+
 // RegisterUser 處理註冊的業務邏輯
 func RegisterUser(username, email, password string) (*entity.User, error) {
-	// Hash password
-	hashedPassword, err := util.HashPassword(password)
-	if err != nil {
-		return nil, err
+	hashedPassword := ""
+	if password != "" {
+		hashedPassword, err := util.HashPassword(password)
+		if err != nil {
+			return nil, err
+		}
+		newUser := entity.User{
+			Username: username,
+			Email:    email,
+			Password: hashedPassword,
+			Picture:  "",
+		}
 	}
-
+	// Hash password
 	newUser := entity.User{
 		Username: username,
 		Email:    email,
 		Password: hashedPassword,
-		Picture:  "https://miro.medium.com/v2/resize:fit:720/format:webp/1*kznyUoRgUcw9pCQUaGfbNw.jpeg",
+		Picture:  "",
 	}
 
 	// Call user repository to create user
 	if err := repository.CreateUser(&newUser); err != nil {
 		return nil, err
 	}
-
 	return &newUser, nil
 }
 

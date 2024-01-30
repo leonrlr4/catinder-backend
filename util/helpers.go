@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
 )
 
 func HashPassword(password string) (string, error) {
@@ -54,4 +55,29 @@ func ParseToken(tokenString string) (int, error) {
 	claims, _ := token.Claims.(jwt.MapClaims)
 
 	return int(claims["user_id"].(float64)), nil
+}
+
+type Endpoint struct {
+	AuthURL  string `json:"auth_url"`
+	TokenURL string `json:"token_url"`
+}
+type GoogleUserInfo struct {
+	ClientID     string   `json:"client_id"`
+	ClientSecret string   `json:"client_secret"`
+	RedirectURL  string   `json:"redirect_url"`
+	Scopes       []string `json:"scopes"`
+	Endpoint     Endpoint `json:"endpoint"`
+}
+
+// get googleOauthConfig from env
+func GetGoogleOauthConfig() *oauth2.Config {
+	return &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  "http://localhost:8080/v1/auth/google/callback",
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+	}
 }

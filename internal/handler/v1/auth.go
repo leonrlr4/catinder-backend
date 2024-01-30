@@ -13,22 +13,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var googleOauthConfig = &oauth2.Config{
-	ClientID:     "514146514235-qfcu7tq5mjih5sh97vno4lj7taj46v4d.apps.googleusercontent.com",
-	ClientSecret: "AIzaSyAF3Gl3j_4oRKFlwIzXD3jO2qZFC1FBmcM",
-	RedirectURL:  "http://localhost:8080/v1/auth/google/callback",
-	Scopes: []string{
-		"https://www.googleapis.com/auth/userinfo.email",
-		"https://www.googleapis.com/auth/userinfo.profile",
-	},
-	Endpoint: oauth2.Endpoint{
-		AuthURL:  "https://accounts.google.com/o/oauth2/auth",
-		TokenURL: "https://accounts.google.com/o/oauth2/token",
-	},
-}
-
 func GoogleLoginHandler(c *gin.Context) {
-	goc := googleOauthConfig
+	goc := util.GetGoogleOauthConfig()
 	url := goc.AuthCodeURL("state", oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
@@ -36,7 +22,7 @@ func GoogleLoginHandler(c *gin.Context) {
 func GoogleCallbackHandler(c *gin.Context) {
 	// Handle the exchange code to initiate a transport.
 	code := c.Query("code")
-	goc := googleOauthConfig
+	goc := util.GetGoogleOauthConfig()
 	token, err := goc.Exchange(context.Background(), code)
 	fmt.Println(err)
 	if err != nil {
@@ -68,7 +54,7 @@ func GoogleCallbackHandler(c *gin.Context) {
 	foundUser, err := service.GetUserByEmail(userInfo.Email)
 	if err != nil {
 		// create a new user
-		_, err := service.RegisterUser(userInfo.UserName, userInfo.Email, userInfo.ID)
+		_, err := service.RegisterUser(userInfo.UserName, userInfo.Email, "")
 		if err != nil {
 			util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 			return

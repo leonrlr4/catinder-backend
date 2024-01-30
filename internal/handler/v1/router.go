@@ -14,6 +14,8 @@ func HomePage(c *gin.Context) {
 }
 
 func SetupRoutes(r *gin.Engine) {
+	r.Use(middleware.CorsMiddleware())
+
 	// home
 	home := r.Group("/v1")
 	{

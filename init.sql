@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     picture VARCHAR(255),
     password VARCHAR(255) NOT NULL,
+    oauth_provider VARCHAR(255),
+    jwt_token VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -18,7 +20,7 @@ VALUES
 
 CREATE TABLE IF NOT EXISTS cats (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
+    cat_name VARCHAR(255) NOT NULL,
     age INT NOT NULL,
     breed VARCHAR(255) NOT NULL,
     owner_id INT,
@@ -27,7 +29,7 @@ CREATE TABLE IF NOT EXISTS cats (
 );
 
 INSERT INTO
-    cats (username, age, breed, owner_id)
+    cats (cat_name, age, breed, owner_id)
 VALUES
     ('Garfield', 5, 'Persian', 1),
     ('Tom', 3, 'Siamese', 1),
