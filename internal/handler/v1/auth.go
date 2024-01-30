@@ -4,6 +4,7 @@ import (
 	"catinder/internal/dto"
 	"catinder/internal/service"
 	"catinder/util"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,9 +14,9 @@ import (
 )
 
 var googleOauthConfig = &oauth2.Config{
-	ClientID:     "YOUR_CLIENT_ID",
-	ClientSecret: "YOUR_CLIENT_SECRET",
-	RedirectURL:  "YOUR_REDIRECT_URL",
+	ClientID:     "514146514235-qfcu7tq5mjih5sh97vno4lj7taj46v4d.apps.googleusercontent.com",
+	ClientSecret: "AIzaSyAF3Gl3j_4oRKFlwIzXD3jO2qZFC1FBmcM",
+	RedirectURL:  "http://localhost:8080/v1/auth/google/callback",
 	Scopes: []string{
 		"https://www.googleapis.com/auth/userinfo.email",
 		"https://www.googleapis.com/auth/userinfo.profile",
@@ -36,7 +37,8 @@ func GoogleCallbackHandler(c *gin.Context) {
 	// Handle the exchange code to initiate a transport.
 	code := c.Query("code")
 	goc := googleOauthConfig
-	token, err := goc.Exchange(oauth2.NoContext, code)
+	token, err := goc.Exchange(context.Background(), code)
+	fmt.Println(err)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to Exchange code"})
 		return
@@ -49,13 +51,12 @@ func GoogleCallbackHandler(c *gin.Context) {
 		return
 	}
 	defer response.Body.Close()
-
 	// Decode user info into a struct.
 	userInfo := struct {
-		ID        string `json:"id"`
-		Email     string `json:"email"`
-		UserrName string `json:"user_name"`
-		Picture   string `json:"picture"`
+		ID       string `json:"id"`
+		Email    string `json:"email"`
+		UserName string `json:"user_name"`
+		Picture  string `json:"picture"`
 	}{}
 	err = json.NewDecoder(response.Body).Decode(&userInfo)
 	if err != nil {
@@ -63,13 +64,40 @@ func GoogleCallbackHandler(c *gin.Context) {
 		return
 	}
 
-	// Here you would create a user in your DB if it doesn't exist
-	// or update the existing one, then generate a JWT.
+	// create a user in your DB if it doesn't exist
+	foundUser, err := service.GetUserByEmail(userInfo.Email)
+	if err != nil {
+		// create a new user
+		_, err := service.RegisterUser(userInfo.UserName, userInfo.Email, userInfo.ID)
+		if err != nil {
+			util.ErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
 
-	// Generate the JWT token for the user
-	// ... (JWT token generation logic)
+		// Generate the JWT token for the existing user
+		token, err := util.GenerateToken(int(foundUser.ID))
+		if err != nil {
+			util.ErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"token": token})
+		return
 
-	c.JSON(http.StatusOK, gin.H{"token": "your_jwt_token_here"})
+	}
+
+	// update the existing user
+	foundUser.Username = userInfo.UserName
+	foundUser.Picture = userInfo.Picture
+	service.UpdateUser(foundUser)
+
+	// Generate the JWT token for the new user
+	newToken, err := util.GenerateToken(int(foundUser.ID))
+	if err != nil {
+		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": newToken})
 }
 
 func LocalLoginHandler(c *gin.Context) {
@@ -80,14 +108,12 @@ func LocalLoginHandler(c *gin.Context) {
 	}
 
 	// check is user  exist
-	fmt.Println(loginInfo)
-
 	user, err := service.GetUserByEmail(loginInfo.Email)
-	// fmt.Println(user)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, "user not exist")
 		return
 	}
+
 	// check password
 	if !(util.CheckPasswordHash(loginInfo.Password, user.Password)) {
 		util.ErrorResponse(c, http.StatusBadRequest, "wrong password")
@@ -103,3 +129,5 @@ func LocalLoginHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
+
+// https://accounts.google.com/o/oauth2/v2/auth?client_id=514146514235-qfcu7tq5mjih5sh97vno4lj7taj46v4d.apps.googleusercontent.com&redirect_uri=http://localhost:8080/v1/auth/google/callback&response_type=code&scope=profile%20email&state=state_string

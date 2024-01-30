@@ -35,4 +35,5 @@ func SetupRoutes(r *gin.Engine) {
 		auth.GET("/google/login", GoogleLoginHandler)
 		auth.GET("/google/callback", GoogleCallbackHandler)
 	}
+
 }

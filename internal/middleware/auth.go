@@ -19,7 +19,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		userID, err := util.ParseToken(token)
-		// println(userID)
 
 		if err != nil {
 			util.ErrorResponse(c, http.StatusUnauthorized, "Invalid token")

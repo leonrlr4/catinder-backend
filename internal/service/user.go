@@ -52,3 +52,8 @@ func GetUserByEmail(email string) (*entity.User, error) {
 
 	return user, nil
 }
+
+// UpdateUser
+func UpdateUser(user *entity.User) error {
+	return repository.UpdateUser(user)
+}

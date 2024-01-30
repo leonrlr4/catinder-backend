@@ -3,6 +3,7 @@ package util
 import (
 	"os"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -29,8 +30,12 @@ func ErrorResponse(c *gin.Context, status int, message string) {
 
 // generate jwt token
 func GenerateToken(userID int) (string, error) {
+	expirationTime := time.Now().Add(24 * time.Hour)
+	// Set expiration time to 1 day from now
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
+		"iat":     time.Now().Unix(),
+		"exp":     expirationTime.Unix(),
 	})
 
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))

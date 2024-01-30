@@ -42,3 +42,9 @@ func FindUserByEmail(email string) (*entity.User, error) {
 	}
 	return &user, nil
 }
+
+// UpdateUser
+func UpdateUser(user *entity.User) error {
+	result := db.Save(user)
+	return result.Error
+}
