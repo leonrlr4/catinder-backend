@@ -16,9 +16,7 @@ func RegisterUserHandler(c *gin.Context) {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	// 調用 service 層的 RegisterUser 函數
-	newUser, err := service.RegisterUser(regInfo.Username, regInfo.Email, regInfo.Password)
+	newUser, err := service.RegisterUser(regInfo.Username, regInfo.Email, regInfo.Password, "")
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -36,7 +34,6 @@ func GetUserHandler(c *gin.Context) {
 		return
 	}
 
-	// 調用 service 層的 GetUser 函數
 	user, err := service.GetUser(userID)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())

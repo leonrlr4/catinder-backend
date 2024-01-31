@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
 INSERT INTO
     users (username, email, password)
 VALUES
-    ('John Doe', 'john@gmail.com', '123456');
+    ('cccccs', 'john@gmail.com', '123456');
 
 CREATE TABLE IF NOT EXISTS cats (
     id INT AUTO_INCREMENT PRIMARY KEY,

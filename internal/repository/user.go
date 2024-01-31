@@ -8,9 +8,10 @@ import (
 
 var db *gorm.DB
 
-func CreateUser(user *entity.User) error {
+func CreateUser(user *entity.User) (int, error) {
 	result := db.Create(user)
-	return result.Error
+	return int(user.ID), result.Error
+
 }
 
 func FindUserByID(userID int) (*entity.User, error) {
@@ -47,4 +48,15 @@ func FindUserByEmail(email string) (*entity.User, error) {
 func UpdateUser(user *entity.User) error {
 	result := db.Save(user)
 	return result.Error
+}
+
+// check if user exists
+func IsUserExist(email string) bool {
+	var user entity.User
+	result := db.
+		Select("ID").
+		Where("email = ?", email).
+		First(&user)
+
+	return result.Error == nil
 }

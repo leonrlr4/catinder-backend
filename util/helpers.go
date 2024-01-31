@@ -81,3 +81,8 @@ func GetGoogleOauthConfig() *oauth2.Config {
 		},
 	}
 }
+
+// GetCurrentTime
+func GetCurrentTime() time.Time {
+	return time.Now().UTC()
+}

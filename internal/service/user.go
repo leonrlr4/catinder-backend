@@ -6,43 +6,43 @@ import (
 	"catinder/internal/entity"
 	"catinder/internal/repository"
 	"catinder/util"
+	"fmt"
 )
 
-type newUser struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Picture  string `json:"picture"`
-}
-
 // RegisterUser 處理註冊的業務邏輯
-func RegisterUser(username, email, password string) (*entity.User, error) {
-	hashedPassword := ""
-	if password != "" {
-		hashedPassword, err := util.HashPassword(password)
-		if err != nil {
-			return nil, err
-		}
-		newUser := entity.User{
-			Username: username,
-			Email:    email,
-			Password: hashedPassword,
-			Picture:  "",
-		}
-	}
-	// Hash password
-	newUser := entity.User{
-		Username: username,
-		Email:    email,
-		Password: hashedPassword,
-		Picture:  "",
+func RegisterUser(username, email, password, OAuthProvider string) (*entity.User, error) {
+	// Check if user exists
+	isUserFound := repository.IsUserExist(email)
+	if isUserFound {
+		return nil, fmt.Errorf("user already exists")
 	}
 
-	// Call user repository to create user
-	if err := repository.CreateUser(&newUser); err != nil {
+	// Hash password
+	hashedPassword, err := util.HashPassword(password)
+	if err != nil {
 		return nil, err
 	}
-	return &newUser, nil
+
+	// Create new user
+	newUser := &entity.User{
+		Username:      username,
+		Email:         email,
+		Password:      hashedPassword,
+		OAuthProvider: OAuthProvider,
+		Picture:       "",
+		JWTToken:      "",
+		CreatedAt:     util.GetCurrentTime().String(),
+		UpdatedAt:     util.GetCurrentTime().String(),
+	}
+
+	// Create user
+	repository.CreateUser(newUser)
+	_, err = GenerateTokenAndUpdateUser(newUser)
+	if err != nil {
+		return nil, err
+	}
+
+	return newUser, nil
 }
 
 // GetUserByID
@@ -70,4 +70,19 @@ func GetUserByEmail(email string) (*entity.User, error) {
 // UpdateUser
 func UpdateUser(user *entity.User) error {
 	return repository.UpdateUser(user)
+}
+
+func GenerateTokenAndUpdateUser(user *entity.User) (string, error) {
+	token, err := util.GenerateToken(int(user.ID))
+	if err != nil {
+		return "", err
+	}
+
+	user.JWTToken = token
+
+	if err := repository.UpdateUser(user); err != nil {
+		return "", fmt.Errorf("could not update user: %v", err)
+	}
+
+	return token, nil
 }
