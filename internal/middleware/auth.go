@@ -3,7 +3,9 @@
 package middleware
 
 import (
+	"catinder/internal/service"
 	"catinder/util"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +23,14 @@ func AuthMiddleware() gin.HandlerFunc {
 		userID, err := util.ParseToken(token)
 
 		if err != nil {
+			util.ErrorResponse(c, http.StatusUnauthorized, "Invalid token")
+			c.Abort()
+			return
+		}
+
+		// Check if the token is still valid for the user
+		user, err := service.GetUserByID(userID)
+		if err != nil || user.JwtToken != token {
 			util.ErrorResponse(c, http.StatusUnauthorized, "Invalid token")
 			c.Abort()
 			return

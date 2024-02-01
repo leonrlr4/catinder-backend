@@ -2,6 +2,7 @@ package repository
 
 import (
 	"catinder/internal/entity"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -48,6 +49,22 @@ func FindUserByEmail(email string) (*entity.User, error) {
 func UpdateUser(user *entity.User) error {
 	result := db.Save(user)
 	return result.Error
+}
+func UpdateUserFields(id uint, updatedFields map[string]interface{}) error {
+	fmt.Println("UpdateUserFields", updatedFields)
+	// Start a new transaction
+	tx := db.Begin()
+
+	// Update only the specified fields
+	tx = tx.Model(&entity.User{}).Where("id = ?", id).Updates(updatedFields)
+
+	// Commit the transaction
+	err := tx.Commit().Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // check if user exists

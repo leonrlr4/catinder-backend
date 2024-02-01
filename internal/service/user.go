@@ -7,7 +7,11 @@ import (
 	"catinder/internal/repository"
 	"catinder/util"
 	"fmt"
+
+	"gorm.io/gorm"
 )
+
+var db *gorm.DB
 
 // RegisterUser 處理註冊的業務邏輯
 func RegisterUser(username, email, password, OAuthProvider string) (*entity.User, error) {
@@ -30,7 +34,7 @@ func RegisterUser(username, email, password, OAuthProvider string) (*entity.User
 		Password:      hashedPassword,
 		OAuthProvider: OAuthProvider,
 		Picture:       "",
-		JWTToken:      "",
+		JwtToken:      "",
 		CreatedAt:     util.GetCurrentTime().String(),
 		UpdatedAt:     util.GetCurrentTime().String(),
 	}
@@ -67,6 +71,15 @@ func GetUserByEmail(email string) (*entity.User, error) {
 	return user, nil
 }
 
+func UpdateUserFields(user *entity.User, updatedFields map[string]interface{}) error {
+	err := repository.UpdateUserFields(user.ID, updatedFields)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpdateUser
 func UpdateUser(user *entity.User) error {
 	return repository.UpdateUser(user)
@@ -78,11 +91,21 @@ func GenerateTokenAndUpdateUser(user *entity.User) (string, error) {
 		return "", err
 	}
 
-	user.JWTToken = token
+	user.JwtToken = token
 
 	if err := repository.UpdateUser(user); err != nil {
 		return "", fmt.Errorf("could not update user: %v", err)
 	}
 
 	return token, nil
+}
+
+// get user by id
+func GetUserByID(userID int) (*entity.User, error) {
+	user, err := repository.FindUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

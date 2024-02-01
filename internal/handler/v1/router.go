@@ -26,6 +26,8 @@ func SetupRoutes(r *gin.Engine) {
 	user := r.Group("/v1/user")
 	{
 		user.POST("/register", RegisterUserHandler)
+		user.POST("/logout", LogoutHandler)
+		user.POST("/login", LocalLoginHandler)
 
 		user.GET("/profile", middleware.AuthMiddleware(), GetUserHandler)
 	}
@@ -33,7 +35,6 @@ func SetupRoutes(r *gin.Engine) {
 	// auth
 	auth := r.Group("v1/auth")
 	{
-		auth.POST("/login", LocalLoginHandler)
 		auth.GET("/google/login", GoogleLoginHandler)
 		auth.GET("/google/callback", GoogleCallbackHandler)
 	}

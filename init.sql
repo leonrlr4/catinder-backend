@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     picture VARCHAR(255),
     password VARCHAR(255) NOT NULL,
-    oauth_provider VARCHAR(255),
+    oauth_provider VARCHAR(255) DEFAULT '',
     jwt_token VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

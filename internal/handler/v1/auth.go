@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -55,7 +56,7 @@ func GoogleCallbackHandler(c *gin.Context) {
 
 	if foundUser.OAuthProvider == "" {
 		foundUser.OAuthProvider = "google"
-		foundUser.JWTToken = token.AccessToken
+		foundUser.JwtToken = token.AccessToken
 		service.UpdateUser(foundUser)
 	}
 
@@ -78,8 +79,8 @@ func getUserInfo(accessToken string) (*struct {
 	UserName      string `json:"user_name"`
 	PassWord      string `json:"password"`
 	Picture       string `json:"picture"`
-	OAuthProvider string `json:"OAuth_provider"`
-	JWTToken      string `json:"jwt_token"`
+	OAuthProvider string `json:"o_auth_provider"`
+	JwtToken      string `json:"jwt_token"`
 }, error) {
 	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + accessToken)
 	if err != nil {
@@ -93,8 +94,8 @@ func getUserInfo(accessToken string) (*struct {
 		UserName      string `json:"user_name"`
 		PassWord      string `json:"password"`
 		Picture       string `json:"picture"`
-		OAuthProvider string `json:"OAuth_provider"`
-		JWTToken      string `json:"jwt_token"`
+		OAuthProvider string `json:"o_auth_provider"`
+		JwtToken      string `json:"jwt_token"`
 	}{}
 
 	err = json.NewDecoder(response.Body).Decode(userInfo)
@@ -118,7 +119,6 @@ func LocalLoginHandler(c *gin.Context) {
 		util.ErrorResponse(c, http.StatusBadRequest, "user not exist")
 		return
 	}
-	fmt.Println("user")
 
 	// check password
 	if !(util.CheckPasswordHash(loginInfo.Password, user.Password)) {
@@ -134,4 +134,35 @@ func LocalLoginHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func LogoutHandler(c *gin.Context) {
+	fmt.Println("LogoutHandler")
+	userIDStr := c.Query("id")
+
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		fmt.Println("Error parsing user ID:", err)
+		util.ErrorResponse(c, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
+
+	updatedFields := map[string]interface{}{
+		"jwt_token": "",
+	}
+
+	user, err := service.GetUser(userID)
+	if err != nil {
+		fmt.Println("Error getting user:", err)
+		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = service.UpdateUserFields(user, updatedFields)
+	if err != nil {
+		fmt.Println("Error updating user:", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Logout successfully"})
 }
