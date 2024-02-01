@@ -7,11 +7,7 @@ import (
 	"catinder/internal/repository"
 	"catinder/util"
 	"fmt"
-
-	"gorm.io/gorm"
 )
-
-var db *gorm.DB
 
 // RegisterUser 處理註冊的業務邏輯
 func RegisterUser(username, email, password, OAuthProvider string) (*entity.User, error) {
@@ -47,17 +43,6 @@ func RegisterUser(username, email, password, OAuthProvider string) (*entity.User
 	}
 
 	return newUser, nil
-}
-
-// GetUserByID
-func GetUser(userID int) (*entity.User, error) {
-	// Find user by ID
-	user, err := repository.FindUserByID(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
 }
 
 // GetUserByEmail
@@ -100,12 +85,11 @@ func GenerateTokenAndUpdateUser(user *entity.User) (string, error) {
 	return token, nil
 }
 
-// get user by id
 func GetUserByID(userID int) (*entity.User, error) {
 	user, err := repository.FindUserByID(userID)
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println("user:", user)
 	return user, nil
 }

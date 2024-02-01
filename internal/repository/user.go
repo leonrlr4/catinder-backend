@@ -18,10 +18,11 @@ func CreateUser(user *entity.User) (int, error) {
 func FindUserByID(userID int) (*entity.User, error) {
 	var user entity.User
 	result := db.
-		Select("ID, Username, Email, Picture").
+		Select("ID, Username, Email, Picture, jwt_token").
 		Omit("Password", "DeletedAt").
 		First(&user, userID)
 
+	fmt.Println(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

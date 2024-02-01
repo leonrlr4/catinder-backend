@@ -4,7 +4,9 @@ import (
 	"catinder/internal/dto"
 	"catinder/internal/service"
 	"catinder/util"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,11 +36,37 @@ func GetUserHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := service.GetUser(userID)
+	user, err := service.GetUserByID(userID)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"user": user})
+}
+
+// IsLoggedInHandler checks if user is logged in
+func IsLoggedInHandler(c *gin.Context) {
+	userIDStr := c.Query("id")
+	userID, err := strconv.Atoi(userIDStr)
+
+	if err != nil {
+		fmt.Println("Error parsing user ID:", err)
+		util.ErrorResponse(c, http.StatusBadRequest, "Invalid user ID")
+
+	}
+	// check if user is logged in by checking if jwt token is empty
+	user, err := service.GetUserByID(userID)
+	if err != nil {
+		fmt.Println("Error getting user:", err)
+		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	fmt.Println("user.JwtToken:", user.JwtToken)
+	if user.JwtToken == "" {
+		c.JSON(http.StatusOK, gin.H{"isLoggedIn": false})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"isLoggedIn": true})
 }

@@ -137,10 +137,9 @@ func LocalLoginHandler(c *gin.Context) {
 }
 
 func LogoutHandler(c *gin.Context) {
-	fmt.Println("LogoutHandler")
 	userIDStr := c.Query("id")
-
 	userID, err := strconv.Atoi(userIDStr)
+
 	if err != nil {
 		fmt.Println("Error parsing user ID:", err)
 		util.ErrorResponse(c, http.StatusBadRequest, "Invalid user ID")
@@ -151,7 +150,7 @@ func LogoutHandler(c *gin.Context) {
 		"jwt_token": "",
 	}
 
-	user, err := service.GetUser(userID)
+	user, err := service.GetUserByID(userID)
 	if err != nil {
 		fmt.Println("Error getting user:", err)
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
