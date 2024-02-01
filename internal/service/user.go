@@ -3,34 +3,33 @@
 package service
 
 import (
+	"catinder/internal/dto"
 	"catinder/internal/entity"
 	"catinder/internal/repository"
 	"catinder/util"
 	"fmt"
 )
 
-// RegisterUser 處理註冊的業務邏輯
-func RegisterUser(username, email, password, OAuthProvider string) (*entity.User, error) {
-	// Check if user exists
-	isUserFound := repository.IsUserExist(email)
+func RegisterUser(registerInfo dto.RegisterInfo) (*entity.User, error) {
+	isUserFound := repository.IsUserExist(registerInfo.Email)
 	if isUserFound {
 		return nil, fmt.Errorf("user already exists")
 	}
 
 	// Hash password
-	hashedPassword, err := util.HashPassword(password)
+	hashedPassword, err := util.HashPassword(registerInfo.Password)
 	if err != nil {
 		return nil, err
 	}
 
 	// Create new user
 	newUser := &entity.User{
-		Username:      username,
-		Email:         email,
+		Username:      registerInfo.Username,
+		Email:         registerInfo.Email,
 		Password:      hashedPassword,
-		OAuthProvider: OAuthProvider,
-		Picture:       "",
-		JwtToken:      "",
+		OAuthProvider: registerInfo.OAuthProvider,
+		Picture:       registerInfo.Picture,
+		JwtToken:      registerInfo.JwtToken,
 		CreatedAt:     util.GetCurrentTime().String(),
 		UpdatedAt:     util.GetCurrentTime().String(),
 	}
@@ -45,7 +44,6 @@ func RegisterUser(username, email, password, OAuthProvider string) (*entity.User
 	return newUser, nil
 }
 
-// GetUserByEmail
 func GetUserByEmail(email string) (*entity.User, error) {
 	// Find user by email
 	user, err := repository.FindUserByEmail(email)
@@ -65,7 +63,6 @@ func UpdateUserFields(user *entity.User, updatedFields map[string]interface{}) e
 	return nil
 }
 
-// UpdateUser
 func UpdateUser(user *entity.User) error {
 	return repository.UpdateUser(user)
 }

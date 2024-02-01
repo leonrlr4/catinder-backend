@@ -10,10 +10,10 @@ The project is structured as follows:
 
 - `cmd/`: Contains the application's entry point (`main.go`). This initiates the server.
 - `internal/`: Contains the application logic.
-    - `handler/`: Contains the HTTP handlers for each endpoint.
-    - `middleware/`: Contains middleware functions for the HTTP handlers.
-    - `model/`: Contains the data models used in the application.
-    - `repository/`: Contains the database operations.
+  - `handler/`: Contains the HTTP handlers for each endpoint.
+  - `middleware/`: Contains middleware functions for the HTTP handlers.
+  - `model/`: Contains the data models used in the application.
+  - `repository/`: Contains the database operations.
 - `pkg/`: Contains packages that can be used by external applications.
 - `scripts/`: Contains scripts for various purposes (e.g., database migration).
 - `db.go`: Contains the database connection logic.

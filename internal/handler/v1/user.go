@@ -18,7 +18,7 @@ func RegisterUserHandler(c *gin.Context) {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	newUser, err := service.RegisterUser(regInfo.Username, regInfo.Email, regInfo.Password, "")
+	newUser, err := service.RegisterUser(regInfo)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
