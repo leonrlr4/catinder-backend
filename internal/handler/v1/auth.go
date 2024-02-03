@@ -54,13 +54,23 @@ func LocalLoginHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := service.GenerateTokenAndUpdateUser(user)
+	_, err = service.GenerateTokenAndUpdateUser(user)
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	newUser := dto.ReturnLoginInfo{
+		ID:            int(user.ID),
+		UserName:      user.Username,
+		Email:         user.Email,
+		Picture:       user.Picture,
+		OAuthProvider: user.OAuthProvider,
+		JwtToken:      user.JwtToken,
+		CreatedAt:     user.CreatedAt,
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user": newUser})
 }
 
 func LogoutHandler(c *gin.Context) {
