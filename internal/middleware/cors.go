@@ -10,6 +10,7 @@ func CorsMiddleware() gin.HandlerFunc {
 		AllowedOrigins:   []string{"http://localhost:3000"}, // 允許的來源
 		AllowedMethods:   []string{"GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"},
 		AllowCredentials: true,
+		AllowedHeaders:   []string{"*"},
 	})
 
 	return func(c *gin.Context) {

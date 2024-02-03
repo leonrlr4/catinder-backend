@@ -28,9 +28,9 @@ func SetupRoutes(r *gin.Engine) {
 		user.POST("/register", RegisterUserHandler)
 		user.POST("/logout", LogoutHandler)
 		user.POST("/login", LocalLoginHandler)
-		user.GET("/isLoggedIn", IsLoggedInHandler)
 
-		user.GET("/profile", middleware.CorsMiddleware(), middleware.AuthMiddleware(), GetUserHandler)
+		user.GET("/isLoggedIn", IsLoggedInHandler)
+		user.GET("/profile", middleware.AuthMiddleware(), GetUserHandler)
 	}
 
 	// auth
