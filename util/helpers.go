@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func HashPassword(password string) (string, error) {
@@ -77,8 +78,8 @@ func GetGoogleOauthConfig() *oauth2.Config {
 		RedirectURL:  "http://localhost:8080/v1/auth/google/callback",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
-			"https://www.googleapis.com/auth/userinfo.profile",
 		},
+		Endpoint: google.Endpoint,
 	}
 }
 

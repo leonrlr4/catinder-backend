@@ -20,19 +20,35 @@ func GoogleLoginHandler(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
-func getUserInfo(accessToken string) (*dto.UserInfo, error) {
+type GoogleUser struct {
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	Picture       string `json:"picture"`
+	VerifiedEmail bool   `json:"verified_email"`
+}
+
+func getGoogleUserInfo(accessToken string) (GoogleUser, error) {
 	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + accessToken)
 	if err != nil {
-		return nil, err
+		return GoogleUser{
+			ID:            "",
+			Email:         "",
+			VerifiedEmail: false,
+			Picture:       "",
+		}, err
 	}
 	defer response.Body.Close()
-
-	userInfo := &dto.UserInfo{}
-	err = json.NewDecoder(response.Body).Decode(userInfo)
+	// Decode the JSON response into our struct type.
+	var userInfo GoogleUser
+	err = json.NewDecoder(response.Body).Decode(&userInfo)
 	if err != nil {
-		return nil, err
+		return GoogleUser{
+			ID:            "",
+			Email:         "",
+			VerifiedEmail: false,
+			Picture:       "",
+		}, err
 	}
-
 	return userInfo, nil
 }
 
@@ -99,24 +115,29 @@ func LogoutHandler(c *gin.Context) {
 
 func GoogleCallbackHandler(c *gin.Context) {
 	var regInfo dto.RegisterInfo
-
 	code := c.Query("code")
 	goc := util.GetGoogleOauthConfig()
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, http.DefaultClient)
 
-	token, err := goc.Exchange(context.Background(), code)
+	token, err := goc.Exchange(ctx, code)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange code"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
-	userInfo, err := getUserInfo(token.AccessToken)
+	googleUserInfo, err := getGoogleUserInfo(token.AccessToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
-	foundUser, err := service.GetUserByEmail(userInfo.Email)
+	foundUser, err := service.GetUserByEmail(googleUserInfo.Email)
 	if err != nil {
+		regInfo.Email = googleUserInfo.Email
+		regInfo.OAuthProvider = "google"
+		regInfo.Picture = googleUserInfo.Picture
+		regInfo.JwtToken = token.AccessToken
+		regInfo.Username = googleUserInfo.ID
 		newUser, err := service.RegisterUser(regInfo)
 		if err != nil {
 			util.ErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -133,21 +154,19 @@ func GoogleCallbackHandler(c *gin.Context) {
 		return
 	}
 
-	if foundUser.OAuthProvider == "" {
-		foundUser.OAuthProvider = "google"
-		foundUser.JwtToken = token.AccessToken
-		service.UpdateUser(foundUser)
+	foundUser.OAuthProvider = "google"
+	foundUser.Picture = googleUserInfo.Picture
+	if foundUser.Username == "" {
+		foundUser.Username = googleUserInfo.ID
 	}
-
-	foundUser.Username = userInfo.Username
-	foundUser.Picture = userInfo.Picture
-	service.UpdateUser(foundUser)
-
 	newToken, err := util.GenerateToken(int(foundUser.ID))
 	if err != nil {
 		util.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	foundUser.JwtToken = newToken
+
+	service.UpdateUser(foundUser)
 
 	c.JSON(http.StatusOK, gin.H{"token": newToken})
 }
