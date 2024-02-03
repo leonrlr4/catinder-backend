@@ -2,7 +2,6 @@ package repository
 
 import (
 	"catinder/internal/entity"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -22,7 +21,6 @@ func FindUserByID(userID int) (*entity.User, error) {
 		Omit("Password", "DeletedAt").
 		First(&user, userID)
 
-	fmt.Println(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -52,7 +50,6 @@ func UpdateUser(user *entity.User) error {
 	return result.Error
 }
 func UpdateUserFields(id uint, updatedFields map[string]interface{}) error {
-	fmt.Println("UpdateUserFields", updatedFields)
 	// Start a new transaction
 	tx := db.Begin()
 

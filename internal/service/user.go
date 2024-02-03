@@ -98,6 +98,5 @@ func GetUserByID(userID int) (*entity.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("user:", user)
 	return user, nil
 }
