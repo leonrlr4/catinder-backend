@@ -30,7 +30,7 @@ func SetupRoutes(r *gin.Engine) {
 		user.POST("/login", LocalLoginHandler)
 		user.GET("/isLoggedIn", IsLoggedInHandler)
 
-		user.GET("/profile", middleware.AuthMiddleware(), GetUserHandler)
+		user.GET("/profile", middleware.CorsMiddleware(), middleware.AuthMiddleware(), GetUserHandler)
 	}
 
 	// auth
