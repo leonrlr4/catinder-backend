@@ -8,9 +8,20 @@ import (
 	"catinder/internal/repository"
 	"catinder/util"
 	"fmt"
+	"regexp"
 )
 
 func RegisterUser(registerInfo dto.RegisterInfo) (*entity.User, error) {
+	// Check if OAuthProvider is empty(local email account)
+	if registerInfo.OAuthProvider == "" {
+		// Check if email is valid
+		emailRegex := `^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,4}$`
+		match, _ := regexp.MatchString(emailRegex, registerInfo.Email)
+		if !match {
+			return nil, fmt.Errorf("invalid email")
+		}
+	}
+
 	isUserFound := repository.IsUserExist(registerInfo.Email)
 	if isUserFound {
 		return nil, fmt.Errorf("user already exists")
